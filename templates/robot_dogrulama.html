@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Robot Doğrulama</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .verification-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #fff;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            font-weight: 300;
+        }
+
+        .verification-box {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+
+        .instruction {
+            margin-bottom: 20px;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .verify-button {
+            background: linear-gradient(to right, #4facfe, #00f2fe);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            max-width: 250px;
+        }
+
+        .verify-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .verify-button:active {
+            transform: translateY(1px);
+        }
+
+        .verify-button:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .loading {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid #fff;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .status-message {
+            margin-top: 15px;
+            font-size: 0.9rem;
+            min-height: 20px;
+        }
+
+        .success {
+            color: #4ade80;
+            font-weight: 500;
+        }
+
+        .error {
+            color: #f87171;
+            font-weight: 500;
+        }
+
+        .footer {
+            margin-top: 25px;
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .security-badge {
+            display: inline-flex;
+            align-items: center;
+            background: rgba(76, 175, 80, 0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+            margin-top: 15px;
+            font-size: 0.8rem;
+        }
+
+        .security-badge i {
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="verification-container">
+        <div class="logo">🔒</div>
+        <h2>Robot Doğrulama</h2>
+
+        <div class="verification-box">
+            <p class="instruction">Web sitemizi korumak için lütfen aşağıdaki butona tıklayarak robot olmadığınızı doğrulayın.</p>
+
+            <button id="verifyBtn" class="verify-button pulse">
+                <span id="btnText">Ben Robot Değilim</span>
+            </button>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p class="status-message" id="statusMessage">Doğrulama analiz ediliyor...</p>
+            </div>
+
+            <div class="security-badge">
+                <i>🛡️</i> <span>Güvenli Bağlantı Koruması</span>
+            </div>
+        </div>
+
+        <p class="footer">Bu doğrulama sayesinde web sitemizi kötü amaçlı botlardan koruyoruz.</p>
+    </div>
+
+    <script>
+        document.getElementById('verifyBtn').addEventListener('click', function() {
+            const btn = this;
+            const btnText = document.getElementById('btnText');
+            const loading = document.getElementById('loading');
+            const statusMessage = document.getElementById('statusMessage');
+
+            // Butonu devre dışı bırak
+            btn.disabled = true;
+            btn.classList.remove('pulse');
+            btnText.textContent = 'Doğrulanıyor...';
+
+            // Yükleme animasyonunu göster
+            loading.style.display = 'block';
+            statusMessage.textContent = 'Doğrulama analiz ediliyor...';
+
+            // Rastgele bir süre beklet (2-5 saniye arası)
+            const randomTime = Math.floor(Math.random() * 3000) + 2000;
+
+            setTimeout(() => {
+                statusMessage.textContent = 'Güvenlik taraması yapılıyor...';
+
+                setTimeout(() => {
+                    // Başarılı doğrulama simülasyonu
+                    statusMessage.textContent = 'Doğrulama başarılı! Yönlendiriliyorsunuz...';
+                    statusMessage.className = 'status-message success';
+
+                    // Başarı animasyonu
+                    btn.style.background = 'linear-gradient(to right, #4ade80, #22c55e)';
+
+                    setTimeout(() => {
+                        // Doğrulama başarılı, verify-success endpoint'ine yönlendir
+                        window.location.href = '/verify-success';
+                    }, 1500);
+
+                }, 1500);
+
+            }, randomTime);
+        });
+    </script>
+</body>
+</html>
