@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Robot Doğrulama</title>
+    <!-- reCAPTCHA v2 script -->
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
+    <style>
+        body { background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d); height:100vh; display:flex; justify-content:center; align-items:center; font-family:sans-serif; margin:0; }
+        .box { background: rgba(0,0,0,0.45); padding:32px; border-radius:12px; text-align:center; max-width:420px; width:92%; color:#fff; }
+        .g-recaptcha { margin: 18px 0; display:flex; justify-content:center; }
+        .msg { margin-top:8px; font-size:0.95rem; color:#eaf2ff; }
+        .error { color:#ffb3b3; margin-bottom:10px; }
+        .small { font-size:0.85rem; opacity:0.9; margin-top:10px; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h2>Robot Doğrulama</h2>
+        <p class="msg">Cloudflare doğrulamasını geçtiyseniz lütfen alttaki kutuyu işaretleyin — işlem tamamlandığında otomatik olarak devam edeceksiniz.</p>
+
+        {% if error %}
+            <div class="error">{{ error }}</div>
+        {% endif %}
+
+        <!-- FORM: buton kaldırıldı. widget tamamlanınca otomatik gönderilecek. -->
+        <form id="captcha-form" action="/verify" method="POST">
+            <!-- site_key Flask tarafından gönderiliyor -->
+            <div
+                class="g-recaptcha"
+                data-sitekey="{{ site_key }}"
+                data-callback="onCaptchaSuccess"
+                data-expired-callback="onCaptchaExpired"
+            ></div>
+
+            <!-- gizli input, otomatik submit için reCAPTCHA token backend'e gönderilecek -->
+            <input type="hidden" name="g-recaptcha-response" id="g-recaptcha-response" />
+        </form>
+
+        <div class="small">Not: Eğer kutu görünmüyorsa tarayıcını yenile ve Cloudflare engellemesi olup olmadığını kontrol et.</div>
+    </div>
+
+    <script>
+        function onCaptchaSuccess(token) {
+            var inp = document.getElementById('g-recaptcha-response');
+            if (inp) {
+                inp.value = token || grecaptcha.getResponse();
+            }
+            var form = document.getElementById('captcha-form');
+            if (form) {
+                form.submit();
+            }
+        }
+
+        function onCaptchaExpired() {
+            var inp = document.getElementById('g-recaptcha-response');
+            if (inp) inp.value = '';
+        }
+    </script>
+</body>
+  </html>
