@@ -10,10 +10,10 @@ app.secret_key = 'change_this_to_a_secure_random_value_in_production'
 
 # --- SENİN VERDİĞİN ANAHTARLAR ---
 # Site anahtarı (HTML'de gösterilecek) - verdiğin değer
-SITE_KEY = "6LfNH9srAAAAAHDqEC81oq4vCQTqRl0bDUriU2HN"
+SITE_KEY = "6LeLZvMrAAAAABCF87VULppo4Ls-STKgF9AMC6lj"
 
 # Gizli anahtar / Secret (backend doğrulama için) - verdiğin değer
-SECRET_KEY = "6LfNH9srAAAAADykYLJ0UujXd2AsYEUTDcZ-LegN"
+SECRET_KEY = "6LeLZvMrAAAAAO1Xv1JDS5juH4d8hHFr-ZOtr43B"
 # ------------------------------------
 
 # RATE LIMIT CONFIG
