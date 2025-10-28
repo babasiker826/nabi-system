@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Nabi System API Market (VIP) - 101 API</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        :root {
+            --primary: #00ff9d; --secondary: #00ccff; --accent: #ff00ff;
+            --dark: #0a0a16; --darker: #050510; --text: #e0e0ff;
+        }
+        body {
+            background-color: var(--darker);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-image:
+                radial-gradient(circle at 10% 20%, rgba(0, 255, 157, 0.05) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(0, 204, 255, 0.05) 0%, transparent 20%),
+                radial-gradient(circle at 50% 50%, rgba(255, 0, 255, 0.03) 0%, transparent 30%);
+        }
+        /* ... stil kodu (öncekiyle aynı) ... */
+        .bg-effects { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden; }
+        .particles { position: absolute; width: 100%; height: 100%; }
+        .particle { position: absolute; width: 4px; height: 4px; background-color: var(--primary); border-radius: 50%; animation: particleFloat 15s infinite linear; opacity: 0.3; }
+        @keyframes particleFloat { 0% { transform: translateY(0) translateX(0); opacity: 0; } 10% { opacity: 0.5; } 50% { opacity: 0.8; } 90% { opacity: 0.5; } 100% { transform: translateY(-100vh) translateX(100px); opacity: 0; } }
+        .grid-lines { position: absolute; width: 100%; height: 100%; background-image: linear-gradient(rgba(0,255,157,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,204,255,0.03) 1px, transparent 1px); background-size: 50px 50px; animation: gridMove 40s linear infinite; }
+        @keyframes gridMove { 0%{transform:translate(0,0);} 100%{transform:translate(50px,50px);} }
+        .pulse-rings { position:absolute; width:100%; height:100%; }
+        .pulse-ring { position:absolute; border-radius:50%; border:1px solid rgba(0,255,157,0.2); animation:pulseRing 8s infinite linear;}
+        .ring-1{width:300px;height:300px;top:10%;left:5%;animation-delay:0s;}
+        .ring-2{width:500px;height:500px;top:60%;left:80%;animation-delay:-2s;}
+        .ring-3{width:200px;height:200px;top:20%;left:70%;animation-delay:-4s;}
+        .ring-4{width:400px;height:400px;top:70%;left:10%;animation-delay:-6s;}
+        @keyframes pulseRing {0%{transform:scale(0.8);opacity:0.5;}50%{transform:scale(1.2);opacity:0.2;}100%{transform:scale(0.8);opacity:0.5;}}
+        .hologram-effect { position:absolute; width:100%; height:100%; background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,255,157,0.03) 2px, rgba(0,255,157,0.03) 4px); animation: hologramMove 20s linear infinite;}
+        @keyframes hologramMove {0%{transform:translateY(0);}100%{transform:translateY(100px);}}
+        .cube-container { position: fixed; top:50%; right:5%; width:100px; height:100px; perspective:1000px; z-index:-1; }
+        .cube { width:100%; height:100%; position:relative; transform-style:preserve-3d; animation:cubeRotate 20s infinite linear; }
+        .cube-face { position:absolute; width:100px; height:100px; background: linear-gradient(45deg, var(--primary), var(--accent)); opacity:0.1; border:1px solid rgba(255,255,255,0.1); }
+        .front{transform:rotateY(0deg) translateZ(50px);} .back{transform:rotateY(180deg) translateZ(50px);} .right{transform:rotateY(90deg) translateZ(50px);} .left{transform:rotateY(-90deg) translateZ(50px);} .top{transform:rotateX(90deg) translateZ(50px);} .bottom{transform:rotateX(-90deg) translateZ(50px);}
+        @keyframes cubeRotate {0%{transform:rotateX(0) rotateY(0) rotateZ(0);}100%{transform:rotateX(360deg) rotateY(360deg) rotateZ(360deg);}}
+        header { text-align:center; padding:3rem 1rem; position:relative; overflow:hidden; }
+        .header-content{position:relative; z-index:2;}
+        .logo{font-size:4.5rem; font-weight:800; margin-bottom:1rem; background:linear-gradient(45deg,var(--primary),var(--secondary),var(--accent)); -webkit-background-clip:text; background-clip:text; color:transparent; text-shadow:0 0 30px rgba(0,255,157,0.5); animation:glow 3s ease-in-out infinite alternate;}
+        @keyframes glow { from { text-shadow: 0 0 20px rgba(0,255,157,0.5), 0 0 30px rgba(0,204,255,0.3), 0 0 40px rgba(255,0,255,0.2); } to { text-shadow: 0 0 30px rgba(0,255,157,0.8), 0 0 40px rgba(0,204,255,0.5), 0 0 50px rgba(255,0,255,0.3); } }
+        .tagline{font-size:1.5rem; margin-bottom:0.5rem; opacity:0.9;}
+        .wazer{font-size:1rem; margin-bottom:1rem; opacity:0.95; color:var(--secondary);}
+        .stats{display:flex; justify-content:center; gap:3rem; margin-top:2rem; flex-wrap:wrap;}
+        .stat-item{ background: rgba(255,255,255,0.05); padding:1rem 2rem; border-radius:10px; backdrop-filter: blur(10px); border:1px solid rgba(255,255,255,0.1); transition: transform 0.3s ease;}
+        .stat-item:hover{ transform:translateY(-5px); border-color:var(--primary); }
+        .stat-number{ font-size:2.5rem; font-weight:700; background: linear-gradient(45deg, var(--primary), var(--secondary)); -webkit-background-clip:text; background-clip:text; color:transparent;}
+        .container{ max-width:1400px; margin:0 auto; padding:0 20px;}
+        .api-grid{ display:grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap:25px; margin:3rem 0; }
+        .api-card{ background: rgba(10,15,30,0.7); border-radius:15px; padding:1.5rem; transition:all 0.4s ease; position:relative; overflow:hidden; border:1px solid rgba(255,255,255,0.1); backdrop-filter:blur(10px); animation:cardEntrance 0.6s ease-out; animation-fill-mode:both; }
+        .api-card::before{ content:''; position:absolute; top:0; left:-100%; width:100%; height:100%; background: linear-gradient(90deg, transparent, rgba(0,255,157,0.1), transparent); transition:left 0.7s; }
+        .api-card:hover::before{ left:100%; } .api-card:hover{ transform:translateY(-10px); box-shadow:0 15px 30px rgba(0,0,0,0.4); border-color:var(--primary); }
+        @keyframes cardEntrance { from { opacity:0; transform:translateY(30px);} to { opacity:1; transform:translateY(0);} }
+        .api-header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; padding-bottom:1rem; border-bottom:1px solid rgba(255,255,255,0.1); }
+        .api-title{ font-size:1.4rem; font-weight:600; color:var(--primary); }
+        .api-badge{ background: linear-gradient(45deg, var(--primary), var(--secondary)); color:var(--darker); padding:0.3rem 0.8rem; border-radius:20px; font-size:0.8rem; font-weight:600; }
+        .api-endpoint{ background: rgba(0,0,0,0.3); padding:1rem; border-radius:8px; margin-bottom:1.5rem; font-family:'Courier New', monospace; font-size:0.9rem; border:1px solid rgba(255,255,255,0.1); position:relative; word-break:break-all; }
+        .api-actions{ display:flex; gap:10px; }
+        .btn{ padding:0.7rem 1.5rem; border:none; border-radius:6px; cursor:pointer; font-weight:600; transition:all 0.3s ease; display:flex; align-items:center; gap:8px; }
+        .btn-copy{ background: linear-gradient(45deg, var(--primary), var(--secondary)); color:var(--darker); flex:1; }
+        .btn-test{ background:transparent; border:1px solid var(--accent); color:var(--accent); }
+        .api-description{ margin-top:1rem; font-size:0.9rem; opacity:0.8; line-height:1.5; }
+        .category-tabs{ display:flex; justify-content:center; margin:2rem 0; flex-wrap:wrap; gap:10px;}
+        .tab{ padding:0.8rem 1.5rem; background:rgba(255,255,255,0.05); border-radius:30px; cursor:pointer; transition:all 0.3s ease; border:1px solid transparent; }
+        .tab.active{ background:rgba(0,255,157,0.1); border-color:var(--primary); color:var(--primary); }
+        footer{ text-align:center; padding:3rem 1rem; margin-top:5rem; border-top:1px solid rgba(255,255,255,0.1); position:relative;}
+        footer::before{ content:''; position:absolute; top:0; left:0; width:100%; height:1px; background:linear-gradient(90deg, transparent, var(--primary), transparent); }
+        .footer-links{ display:flex; justify-content:center; gap:2rem; margin:2rem 0; flex-wrap:wrap; }
+        .footer-link{ color:var(--text); text-decoration:none; transition:color 0.3s; }
+        .footer-link:hover{ color:var(--primary); }
+        .notification{ position:fixed; bottom:20px; right:20px; background:linear-gradient(45deg,var(--primary),var(--secondary)); color:var(--darker); padding:1rem 2rem; border-radius:8px; box-shadow:0 5px 15px rgba(0,0,0,0.3); transform:translateY(100px); opacity:0; transition:all 0.5s ease; z-index:1000; font-weight:600; }
+        .notification.show{ transform:translateY(0); opacity:1; }
+        .funny-message{ position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:linear-gradient(45deg,var(--primary),var(--accent)); color:var(--darker); padding:2rem; border-radius:15px; font-size:2rem; font-weight:bold; text-align:center; z-index:10000; box-shadow:0 0 50px rgba(0,0,0,0.7); animation:pulse 1.5s infinite; display:none; }
+        @keyframes pulse {0%{transform:translate(-50%,-50%) scale(1);}50%{transform:translate(-50%,-50%) scale(1.1);}100%{transform:translate(-50%,-50%) scale(1);}}
+        @media (max-width:768px){ .api-grid{ grid-template-columns:1fr; } .logo{font-size:3rem;} .funny-message{font-size:1.5rem; padding:1.5rem;} .cube-container{display:none;} }
+    </style>
+</head>
+<body>
+    <div class="funny-message" id="funnyMessage">daha cok ekmek yemen gerekiyo bebeğim 😝</div>
+
+    <div class="cube-container">
+        <div class="cube">
+            <div class="cube-face front"></div>
+            <div class="cube-face back"></div>
+            <div class="cube-face right"></div>
+            <div class="cube-face left"></div>
+            <div class="cube-face top"></div>
+            <div class="cube-face bottom"></div>
+        </div>
+    </div>
+
+    <div class="bg-effects">
+        <div class="particles" id="particles"></div>
+        <div class="grid-lines"></div>
+        <div class="pulse-rings">
+            <div class="pulse-ring ring-1"></div>
+            <div class="pulse-ring ring-2"></div>
+            <div class="pulse-ring ring-3"></div>
+            <div class="pulse-ring ring-4"></div>
+        </div>
+        <div class="hologram-effect"></div>
+    </div>
+
+    <header>
+        <div class="header-content">
+            <h1 class="logo">NABI SYSTEM</h1>
+            <p class="tagline">Milyonluk Veritabanına Erişim İçin Premium API'ler</p>
+            <p class="wazer">WAZER oe olsada seviyom bunu🥰</p>
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-number">101+</div>
+                    <div>Toplam API</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">101M+</div>
+                    <div>Veri Kaydı</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">7/24</div>
+                    <div>Aktif Servis</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="category-tabs">
+            <div class="tab active" data-category="all">Tüm API'ler</div>
+            <div class="tab" data-category="tc">TC Sorgulama</div>
+            <div class="tab" data-category="communication">İletişim</div>
+            <div class="tab" data-category="location">Lokasyon</div>
+            <div class="tab" data-category="internet">İnternet</div>
+            <div class="tab" data-category="other">Diğer</div>
+            <div class="tab" data-category="vip">VIP OSINT</div>
+        </div>
+
+        <div class="api-grid" id="api-grid"></div>
+    </main>
+
+    <div class="container">
+        <section id="contact" class="info-section" aria-labelledby="contact-title">
+            <h2 id="contact-title">İletişim & Destek</h2>
+            <p class="small">Destek almak veya sorularınızı iletmek için Telegram üzerinden bize ulaşabilirsiniz:</p>
+            <p style="margin-top:0.5rem; font-weight:700;">Telegram: <a href="https://t.me/sukazatkinis" target="_blank" rel="noopener" style="color:var(--primary); text-decoration:none;">@sukazatkinis</a></p>
+            <p class="small" style="margin-top:0.8rem;">Destek taleplerinizi açık ve net şekilde yazınız (kullandığınız API endpoint, örnek istek, karşılaştığınız hata vb.). Gizlilik ve güvenlik gereği kişisel verilerin tamamını Telegram üzerinden paylaşmayın — yalnızca gerekli teknik bilgileri iletin.</p>
+        </section>
+
+        <section id="terms" class="info-section" aria-labelledby="terms-title">
+            <h2 id="terms-title">Kullanım Şartları (Yasal Uyarı)</h2>
+            <p class="small">Nabi System tarafından sağlanan API'ler yalnızca yasal, etik ve sözleşmeye uygun amaçlarla kullanılmalıdır.</p>
+        </section>
+
+        <section id="privacy" class="info-section" aria-labelledby="privacy-title">
+            <h2 id="privacy-title">Gizlilik Politikası</h2>
+            <p class="small">Toplanan veriler sunucu logları, teknik hata raporları ve kullanıcı tarafından sağlanan iletişim bilgileri olabilir.</p>
+        </section>
+    </div>
+
+    <footer>
+        <div class="footer-links">
+            <a href="#terms" class="footer-link">Kullanım Koşulları</a>
+            <a href="#privacy" class="footer-link">Gizlilik Politikası</a>
+            <a href="#contact" class="footer-link">Destek / İletişim</a>
+            <a href="#" class="footer-link">API Dokümantasyonu</a>
+            <a href="#" class="footer-link">SSS</a>
+        </div>
+        <p class="copyright">© 2025 Nabi System API Servis. Tüm hakları saklıdır.</p>
+    </footer>
+
+    <div class="notification" id="notification">API endpoint panoya kopyalandı!</div>
+
+    <script>
+        // TAM 101 API listesi (isim, endpoint, category, description)
+        const apiList = [
+            {
+                "name": "Seçmen Sorgulama",
+                "endpoint": "https://nabi-sorgu-api.system.22web.org/secmen_sorgulama?q=",
+                "category": "other",
+                "description": "Seçmen Sorgulama endpointi"
+            },
+            {
+                "name": "Öğretmen Sorgulama",
+                "endpoint": "https://nabi-sorgu-api.system.22web.org/ogretmen_sorgulama?q=",
+                "category": "other",
+                "description": "Öğretmen Sorgulama endpointi"
+            },
+            {
+                "name": "SMS Bomber",
+                "endpoint": "https://nabi-sorgu-api.system.22web.org/sms_bomber?q=",
+                "category": "communication",
+                "description": "SMS Bomber endpointi"
+            },
+            {
+                "name": "Yabancı Sorgulama",
+                "endpoint": "https://nabi-sorgu-api.system.22web.org/yabanci_sorgulama?q=",
+                "category": "other",
+                "description": "Yabancı Sorgulama endpointi"
+            },
+            {
+                "name": "Site Log Sorgulama",
+                "endpoint": "https://nabi-sorgu-api.system.22web.org/site_log_sorgulama?q=",
+                "category": "internet",
+                "description": "Site Log Sorgulama endpointi"
+            },
+            {
+                "name": "Vesika Sorgulama (Hanedan)",
+                "endpoint": "https://nabi-sorgu-api.system.22web.org/vesika2?q=",
+                "category": "other",
+                "description": "Vesika Sorgulama (Hanedan) endpointi"
+            },
+            {
+                "name": "Tapu Sorgulama (Hanedan)",
+                "endpoint": "https://nabi-sorgu-api.system.22web.org/tapu2?q=",
+                "category": "location",
+                "description": "Tapu Sorgulama (Hanedan) endpointi"
+            },
+            {
+                "name": "İş Kaydı Sorgulama",
+                "endpoint": "https://nabi-sorgu-api.system.22web.org/iskaydi?q=",
+                "category": "other",
+                "description": "İş Kaydı Sorgulama endpointi"
+            },
+            {
+                "name": "Sertifika Sorgulama (Hanedan)",
+                "endpoint": "https://nabi-sorgu-api.system.22web.org/sertifika2?q=",
+                "category": "other",
+                "description": "Sertifika Sorgulama (Hanedan) endpointi"
+            },
+            {
+                "name": "Papara No Sorgulama",
+                "endpoint": "https://nabi-sorgu-api.system.22web.org/papara?q=",
+                "category": "communication",
+                "description": "Papara No Sorgulama endpointi"
+            },
+            {
+                "name": "İninal No Sorgulama",
+                "endpoint": "https://nabi-sorgu-api.system.22web.org/ininal?q=",
+                "category": "communication",
+                "description": "İninal No Sorgulama endpointi"
+            },
+            {
+                "name": "TurkNet Sorgulama",
+                "endpoint": "https://nabi-sorgu-api.system.22web.org/turknet?q=",
+                "category": "internet",
+                "description": "TurkNet Sorgulama endpointi"
+            },
+            {
+                "name": "Seri No Sorgulama",
+                "endpoint": "https://nabi-sorgu-api.system.22web.org/serino?q=",
+                "category": "other",
+                "description": "Seri No Sorgulama endpointi"
+            },
+            {
+                "name": "Firma Ünvan Sorgulama",
+                "endpoint": "https://nabi-sorgu-api.system.22web.org/firma?q=",
+                "category": "other",
+                "description": "Firma Ünvan Sorgulama endpointi"
+            },
+            {
+                "name": "Craftrise Kullanıcı Sorgu",
+                "endpoint": "https://nabi-sorgu-api.system.22web.org/craftrise?q=",
+                "category": "other",
+                "description": "Craftrise Kullanıcı Sorgu endpointi"
+            },
+            {
+                "name": "SGK Sorgulama (Hanedan)",
+                "endpoint": "https://nabi-sorgu-api.system.22web.org/sgk2?q=",
+                "category": "tc",
+                "description": "SGK Sorgulama (Hanedan) endpointi"
+            },
+            {
+                "name": "Plaka Sorgulama (Hanedan)",
+                "endpoint": "https://nabi-sorgu-api.system.22web.org/plaka2?q=",
+                "category": "location",
+                "description": "Plaka Sorgulama (Hanedan) endpointi"
+            },
+            {
+                "name": "Plaka İsim Sorgulama",
+                "endpoint": "https://nabi-sorgu-api.system.22web.org/plakaismi?q=",
+                "category": "location",
+                "description": "Plaka İsim Sorgulama endpointi"
+            },
+            {
+                "name": "Plaka Borç Sorgulama",
+                "endpoint": "https://nabi-sorgu-api.system.22web.org/plakaborc?q=",
+                "category": "location",
+                "description": "Plaka Borç Sorgulama endpointi"
+            },
+            {
+                "name": "AKP Üye Sorgulama",
+                "endpoint": "https://nabi-sorgu-api.system.22web.org/akp?q=",
+                "category": "other",
+                "description": "AKP Üye Sorgulama endpointi"
+            },
+            {
+                "name": "AI Fotoğraf Üretici",
+                "endpoint": "https://nabi-sorgu-api.system.22web.org/aifoto?q=",
+                "category": "other",
+                "description": "AI Fotoğraf Üretici endpointi"
+            },
+            {
+                "name": "Instagram Kullanıcı Sorgulama",
+                "endpoint": "https://nabi-sorgu-api.system.22web.org/insta?q=",
+                "category": "communication",
+                "description": "Instagram Kullanıcı Sorgulama endpointi"
+            },
+            {
+                "name": "Facebook Kullanıcı Sorgulama (Hanedan)",
+                "endpoint": "https://nabi-sorgu-api.system.22web.org/facebook_hanedan?q=",
+                "category": "communication",
+                "description": "Facebook Kullanıcı Sorgulama (Hanedan) endpointi"
+            },
+            {
+                "name": "Üniversite Öğrenci Sorgulama",
+                "endpoint": "https://nabi-sorgu-api.system.22web.org/uni?q=",
+                "category": "other",
+                "description": "Üniversite Öğrenci Sorgulama endpointi"
+            },
+            {
+                "name": "LGS Sorgulama (Hanedan)",
+                "endpoint": "https://nabi-sorgu-api.system.22web.org/lgs_hanedan?q=",
+                "category": "other",
+                "description": "LGS Sorgulama (Hanedan) endpointi"
+            },
+            {
+                "name": "Okul Numarası Sorgulama",
+                "endpoint": "https://nabi-sorgu-api.system.22web.org/okulno_hanedan?q=",
+                "category": "other",
+                "description": "Okul Numarası Sorgulama endpointi"
+            },
+            {
+                "name": "TC Sorgulama",
+                "endpoint": "https://nabi-sorgu-api.system.22web.org/tc_sorgulama?q=",
+                "category": "tc",
+                "description": "TC Sorgulama endpointi"
+            },
+            {
+                "name": "TC PRO Sorgulama",
+                "endpoint": "https://nabi-sorgu-api.system.22web.org/tc_pro_sorgulama?q=",
+                "category": "tc",
+                "description": "TC PRO Sorgulama endpointi"
+            },
+            {
+                "name": "Hayat Hikayesi Sorgulama",
+                "endpoint": "https://nabi-sorgu-api.system.22web.org/hayat_hikayesi?q=",
+                "category": "tc",
+                "description": "Hayat Hikayesi Sorgulama endpointi"
+            },
+            {
+                "name": "Ad Soyad Sorgulama",
+                "endpoint": "https://nabi-sorgu-api.system.22web.org/ad_soyad?q=",
+                "category": "tc",
+                "description": "Ad Soyad Sorgulama endpointi"
+            },
+            {
+                "name": "Ad Soyad PRO Sorgulama",
+                "endpoint": "https://nabi-sorgu-api.system.22web.org/ad_soyad_pro?q=",
+                "category": "tc",
+                "description": "Ad Soyad PRO Sorgulama endpointi"
+            },
+            {
+                "name": "İş Yeri Sorgulama",
+                "endpoint": "https://nabi-sorgu-api.system.22web.org/is_yeri?q=",
+                "category": "tc",
+                "description": "İş Yeri Sorgulama endpointi"
+            },
+            {
+                "name": "Vergi No Sorgulama",
+                "endpoint": "https://nabi-sorgu-api.system.22web.org/vergi_no?q=",
+                "category": "tc",
+                "description": "Vergi No Sorgulama endpointi"
+            },
+            {
+                "name": "Yaş Sorgulama",
+                "endpoint": "https://nabi-sorgu-api.system.22web.org/yas?q=",
+                "category": "tc",
+                "description": "Yaş Sorgulama endpointi"
+            },
+            {
+                "name": "TC GSM Sorgulama",
+                "endpoint": "https://nabi-sorgu-api.system.22web.org/tc_gsm?q=",
+                "category": "communication",
+                "description": "TC GSM Sorgulama endpointi"
+            },
+            {
+                "name": "GSM TC Sorgulama",
+                "endpoint": "https://nabi-sorgu-api.system.22web.org/gsm_tc?q=",
+                "category": "communication",
+                "description": "GSM TC Sorgulama endpointi"
+            },
+            {
+                "name": "Adres Sorgulama",
+                "endpoint": "https://nabi-sorgu-api.system.22web.org/adres?q=",
+                "category": "location",
+                "description": "Adres Sorgulama endpointi"
+            },
+            {
+                "name": "Hane Sorgulama",
+                "endpoint": "https://nabi-sorgu-api.system.22web.org/hane?q=",
+                "category": "location",
+                "description": "Hane Sorgulama endpointi"
+            },
+            {
+                "name": "Apartman Sorgulama",
+                "endpoint": "https://nabi-sorgu-api.system.22web.org/apartman?q=",
+                "category": "location",
+                "description": "Apartman Sorgulama endpointi"
+            },
+            {
+                "name": "Ada Parsel Sorgulama",
+                "endpoint": "https://nabi-sorgu-api.system.22web.org/ada_parsel?q=",
+                "category": "location",
+                "description": "Ada Parsel Sorgulama endpointi"
+            },
+            {
+                "name": "Adı İl İlçe Sorgulama",
+                "endpoint": "https://nabi-sorgu-api.system.22web.org/adi_il_ilce?q=",
+                "category": "location",
+                "description": "Adı İl İlçe Sorgulama endpointi"
+            },
+            {
+                "name": "Aile Sorgulama",
+                "endpoint": "https://nabi-sorgu-api.system.22web.org/aile?q=",
+                "category": "tc",
+                "description": "Aile Sorgulama endpointi"
+            },
+            {
+                "name": "Aile PRO Sorgulama",
+                "endpoint": "https://nabi-sorgu-api.system.22web.org/aile_pro?q=",
+                "category": "tc",
+                "description": "Aile PRO Sorgulama endpointi"
+            },
+            {
+                "name": "Eş Sorgulama",
+                "endpoint": "https://nabi-sorgu-api.system.22web.org/es?q=",
+                "category": "tc",
+                "description": "Eş Sorgulama endpointi"
+            },
+            {
+                "name": "Sülale Sorgulama",
+                "endpoint": "https://nabi-sorgu-api.system.22web.org/sulale?q=",
+                "category": "tc",
+                "description": "Sülale Sorgulama endpointi"
+            },
+            {
+                "name": "LGS Sorgulama",
+                "endpoint": "https://nabi-sorgu-api.system.22web.org/lgs?q=",
+                "category": "other",
+                "description": "LGS Sorgulama endpointi"
+            },
+            {
+                "name": "E-Kurs Sorgulama",
+                "endpoint": "https://nabi-sorgu-api.system.22web.org/e_kurs?q=",
+                "category": "other",
+                "description": "E-Kurs Sorgulama endpointi"
+            },
+            {
+                "name": "IP Sorgulama",
+                "endpoint": "https://nabi-sorgu-api.system.22web.org/ip?q=",
+                "category": "internet",
+                "description": "IP Sorgulama endpointi"
+            },
+            {
+                "name": "DNS Sorgulama",
+                "endpoint": "https://nabi-sorgu-api.system.22web.org/dns?q=",
+                "category": "internet",
+                "description": "DNS Sorgulama endpointi"
+            },
+            {
+                "name": "Whois Sorgulama",
+                "endpoint": "https://nabi-sorgu-api.system.22web.org/whois?q=",
+                "category": "internet",
+                "description": "Whois Sorgulama endpointi"
+            },
+            {
+                "name": "Subdomain Sorgulama",
+                "endpoint": "https://nabi-sorgu-api.system.22web.org/subdomain?q=",
+                "category": "internet",
+                "description": "Subdomain Sorgulama endpointi"
+            },
+            {
+                "name": "Leak Sorgulama",
+                "endpoint": "https://nabi-sorgu-api.system.22web.org/leak?q=",
+                "category": "internet",
+                "description": "Leak Sorgulama endpointi"
+            },
+            {
+                "name": "Telegram Sorgulama",
+                "endpoint": "https://nabi-sorgu-api.system.22web.org/telegram?q=",
+                "category": "communication",
+                "description": "Telegram Sorgulama endpointi"
+            },
+            {
+                "name": "Şifre Encrypt",
+                "endpoint": "https://nabi-sorgu-api.system.22web.org/sifre_encrypt?q=",
+                "category": "other",
+                "description": "Şifre Encrypt endpointi"
+            },
+
+            /* --- VIP OSINT 45'lik blok (newvip) başlıyor --- */
+
+            {
+                "name": "IP Geolocation",
+                "endpoint": "https://newvip.nabi.22web.org/api/ip?address=8.8.8.8",
+                "category": "vip",
+                "description": "IP adresi ile konum bilgisi getirir."
+            },
+            {
+                "name": "Phone Analysis",
+                "endpoint": "https://newvip.nabi.22web.org/api/phone?number=905551234567",
+                "category": "vip",
+                "description": "Telefon numarası analiz modülü."
+            },
+            {
+                "name": "Email OSINT",
+                "endpoint": "https://newvip.nabi.22web.org/api/email?address=test@example.com",
+                "category": "vip",
+                "description": "E-posta adresi ile OSINT sorgusu."
+            },
+            {
+                "name": "Username Search",
+                "endpoint": "https://newvip.nabi.22web.org/api/username?name=elonmusk",
+                "category": "vip",
+                "description": "Kullanıcı adı araması."
+            },
+            {
+                "name": "Domain WHOIS",
+                "endpoint": "https://newvip.nabi.22web.org/api/domain?name=google.com",
+                "category": "vip",
+                "description": "Domain whois bilgilerini getirir."
+            },
+            {
+                "name": "Bitcoin Analysis",
+                "endpoint": "https://newvip.nabi.22web.org/api/btc?address=1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
+                "category": "vip",
+                "description": "Bitcoin adresi analizi."
+            },
+            {
+                "name": "Ethereum Analysis",
+                "endpoint": "https://newvip.nabi.22web.org/api/eth?address=0x742d35Cc6634C0532925a3b8D",
+                "category": "vip",
+                "description": "Ethereum adresi analizi."
+            },
+            {
+                "name": "BIN Check",
+                "endpoint": "https://newvip.nabi.22web.org/api/bin?number=123456",
+                "category": "vip",
+                "description": "Kart BIN kontrolü."
+            },
+            {
+                "name": "MAC Lookup",
+                "endpoint": "https://newvip.nabi.22web.org/api/mac?address=00:1B:44:11:3A:B7",
+                "category": "vip",
+                "description": "MAC adresi sorgulama."
+            },
+            {
+                "name": "IMEI Check",
+                "endpoint": "https://newvip.nabi.22web.org/api/imei?number=123456789012345",
+                "category": "vip",
+                "description": "IMEI kontrolü."
+            },
+            {
+                "name": "VPN Detection",
+                "endpoint": "https://newvip.nabi.22web.org/api/vpn?ip=8.8.8.8",
+                "category": "vip",
+                "description": "VPN / proxy tespiti."
+            },
+            {
+                "name": "Data Breach Check",
+                "endpoint": "https://newvip.nabi.22web.org/api/breach?email=test@example.com",
+                "category": "vip",
+                "description": "E-posta sızıntı kontrolü."
+            },
+            {
+                "name": "SSL Check",
+                "endpoint": "https://newvip.nabi.22web.org/api/ssl?domain=google.com",
+                "category": "vip",
+                "description": "SSL sertifika kontrolü."
+            },
+            {
+                "name": "Domain History",
+                "endpoint": "https://newvip.nabi.22web.org/api/domainhistory?domain=google.com",
+                "category": "vip",
+                "description": "Domain geçmişi araştırması."
+            },
+            {
+                "name": "Metadata Analysis",
+                "endpoint": "https://newvip.nabi.22web.org/api/metadata?url=https://google.com",
+                "category": "vip",
+                "description": "Sayfa / dosya metadata analizi."
+            },
+            {
+                "name": "Script Analysis",
+                "endpoint": "https://newvip.nabi.22web.org/api/script?url=https://google.com",
+                "category": "vip",
+                "description": "Sayfa script analizörü."
+            },
+            {
+                "name": "Crypto Wallet",
+                "endpoint": "https://newvip.nabi.22web.org/api/crypto?address=1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
+                "category": "vip",
+                "description": "Kripto cüzdan analizi."
+            },
+            {
+                "name": "Darknet Monitoring",
+                "endpoint": "https://newvip.nabi.22web.org/api/darknet?query=bitcoin",
+                "category": "vip",
+                "description": "Darknet izleme araması."
+            },
+            {
+                "name": "Telegram OSINT",
+                "endpoint": "https://newvip.nabi.22web.org/api/telegram?username=elonmusk",
+                "category": "vip",
+                "description": "Telegram kullanıcı araştırması."
+            },
+            {
+                "name": "Instagram Analysis",
+                "endpoint": "https://newvip.nabi.22web.org/api/instagram?username=elonmusk",
+                "category": "vip",
+                "description": "Instagram profili analizi."
+            },
+            {
+                "name": "VK Scanner",
+                "endpoint": "https://newvip.nabi.22web.org/api/vk?user=1",
+                "category": "vip",
+                "description": "VK profili arama."
+            },
+            {
+                "name": "WhatsApp Detection",
+                "endpoint": "https://newvip.nabi.22web.org/api/whatsapp?phone=905551234567",
+                "category": "vip",
+                "description": "WhatsApp kullanım kontrolü."
+            },
+            {
+                "name": "Tax Data Check",
+                "endpoint": "https://newvip.nabi.22web.org/api/tax?inn=1234567890",
+                "category": "vip",
+                "description": "Vergi verisi sorgulama."
+            },
+            {
+                "name": "Court Cases Search",
+                "endpoint": "https://newvip.nabi.22web.org/api/court?name=Иванов",
+                "category": "vip",
+                "description": "Dava / mahkeme arama."
+            },
+            {
+                "name": "Patent Search",
+                "endpoint": "https://newvip.nabi.22web.org/api/patent?query=blockchain",
+                "category": "vip",
+                "description": "Patent araması."
+            },
+            {
+                "name": "Trademark Search",
+                "endpoint": "https://newvip.nabi.22web.org/api/trademark?query=nike",
+                "category": "vip",
+                "description": "Marka sorgulama."
+            },
+            {
+                "name": "Flight Search",
+                "endpoint": "https://newvip.nabi.22web.org/api/flight?number=SU100",
+                "category": "vip",
+                "description": "Uçuş sorgulama."
+            },
+            {
+                "name": "Hotel Booking",
+                "endpoint": "https://newvip.nabi.22web.org/api/hotel?booking=ABC123",
+                "category": "vip",
+                "description": "Otel rezervasyon sorgulama."
+            },
+            {
+                "name": "Rental Search",
+                "endpoint": "https://newvip.nabi.22web.org/api/rental?location=Москва",
+                "category": "vip",
+                "description": "Kiralama ilanı araması."
+            },
+            {
+                "name": "Car Plate Check",
+                "endpoint": "https://newvip.nabi.22web.org/api/carplate?plate=А001АА77",
+                "category": "vip",
+                "description": "Araç plaka kontrolü."
+            },
+            {
+                "name": "Driver License Check",
+                "endpoint": "https://newvip.nabi.22web.org/api/driver?license=1234567890",
+                "category": "vip",
+                "description": "Sürücü belgesi doğrulama."
+            },
+            {
+                "name": "Passport Check",
+                "endpoint": "https://newvip.nabi.22web.org/api/passport?number=1234567890",
+                "category": "vip",
+                "description": "Pasaport kontrolü."
+            },
+            {
+                "name": "Medical Records",
+                "endpoint": "https://newvip.nabi.22web.org/api/medical?name=Иванов",
+                "category": "vip",
+                "description": "Tıbbi kayıt araması (izinli kullanım)."
+            },
+            {
+                "name": "Education Search",
+                "endpoint": "https://newvip.nabi.22web.org/api/education?name=Иванов",
+                "category": "vip",
+                "description": "Eğitim geçmişi araştırması."
+            },
+            {
+                "name": "Work History",
+                "endpoint": "https://newvip.nabi.22web.org/api/work?name=Иванов",
+                "category": "vip",
+                "description": "İş geçmişi araması."
+            },
+            {
+                "name": "Credit History",
+                "endpoint": "https://newvip.nabi.22web.org/api/credit?name=Иванов",
+                "category": "vip",
+                "description": "Kredi geçmişi kontrolü."
+            },
+            {
+                "name": "Real Estate",
+                "endpoint": "https://newvip.nabi.22web.org/api/realestate?address=Москва",
+                "category": "vip",
+                "description": "Gayrimenkul kayıtları araması."
+            },
+            {
+                "name": "Land Plot",
+                "endpoint": "https://newvip.nabi.22web.org/api/land?cadastral=77:01:0001001:1001",
+                "category": "vip",
+                "description": "Kadastro / parsel sorgulama."
+            },
+            {
+                "name": "Corporate Data",
+                "endpoint": "https://newvip.nabi.22web.org/api/corporate?company=Google",
+                "category": "vip",
+                "description": "Şirket bilgileri araması."
+            },
+            {
+                "name": "Marine Vessel",
+                "endpoint": "https://newvip.nabi.22web.org/api/marine?imo=1234567",
+                "category": "vip",
+                "description": "Gemi / IMO sorgulama."
+            },
+            {
+                "name": "Aircraft Search",
+                "endpoint": "https://newvip.nabi.22web.org/api/aircraft?reg=RA-12345",
+                "category": "vip",
+                "description": "Uçak kayıt sorgulama."
+            },
+            {
+                "name": "Yandex Search",
+                "endpoint": "https://newvip.nabi.22web.org/api/yandex?query=bitcoin",
+                "category": "vip",
+                "description": "Yandex arama modülü."
+            },
+            {
+                "name": "Reverse Image",
+                "endpoint": "https://newvip.nabi.22web.org/api/reverseimage?url=https://example.com/image.jpg",
+                "category": "vip",
+                "description": "Ters görsel arama."
+            },
+            {
+                "name": "Browser Fingerprint",
+                "endpoint": "https://newvip.nabi.22web.org/api/browser?ua=Mozilla/5.0%20(Windows%20NT%2010.0;%20Win64;%20x64)%20AppleWebKit/537.36",
+                "category": "vip",
+                "description": "Tarayıcı parmak izi analizi."
+            },
+            {
+                "name": "Crypto Transactions",
+                "endpoint": "https://newvip.nabi.22web.org/api/cryptotx?address=1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
+                "category": "vip",
+                "description": "Kripto işlem geçmişi."
+            },
+
+            /* --- Ek 3+ API (101'e tamamlamak için) --- */
+            {
+                "name": "Device Info",
+                "endpoint": "https://newvip.nabi.22web.org/api/device_info?udid=ABC123",
+                "category": "vip",
+                "description": "Cihaz bilgisi sorgulama (model, os)."
+            },
+            {
+                "name": "Browser Session",
+                "endpoint": "https://newvip.nabi.22web.org/api/browser_session?sid=XYZ",
+                "category": "vip",
+                "description": "Tarayıcı oturum / session bilgisi."
+            },
+            {
+                "name": "API Health Check",
+                "endpoint": "https://newvip.nabi.22web.org/api/health",
+                "category": "vip",
+                "description": "API servis sağlık durumu kontrolü."
+            }
+        ];
+
+        // Parçacık efekti oluşturma
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 100;
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                const left = Math.random() * 100;
+                const top = Math.random() * 100;
+                const size = Math.random() * 3 + 1;
+                const delay = Math.random() * 15;
+                const duration = Math.random() * 10 + 10;
+                particle.style.left = `${left}%`;
+                particle.style.top = `${top}%`;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.animationDelay = `${delay}s`;
+                particle.style.animationDuration = `${duration}s`;
+                const colors = ['#00ff9d','#00ccff','#ff00ff'];
+                particle.style.backgroundColor = colors[Math.floor(Math.random()*colors.length)];
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        function createApiCards(category = 'all') {
+            const apiGrid = document.getElementById('api-grid');
+            apiGrid.innerHTML = '';
+            const filteredApis = category === 'all' ? apiList : apiList.filter(api => api.category === category);
+            if (filteredApis.length === 0) {
+                apiGrid.innerHTML = '<div class="api-card" style="text-align:center; grid-column:1/-1;"><p>Bu kategoride API bulunmamaktadır.</p></div>';
+                return;
+            }
+            filteredApis.forEach((api, index) => {
+                const apiCard = document.createElement('div');
+                apiCard.className = 'api-card';
+                apiCard.style.animationDelay = `${index * 0.04}s`;
+                apiCard.innerHTML = `
+                    <div class="api-header">
+                        <h3 class="api-title">${api.name}</h3>
+                        <span class="api-badge">VIP</span>
+                    </div>
+                    <div class="api-endpoint">${api.endpoint}</div>
+                    <div class="api-actions">
+                        <button class="btn btn-copy" data-endpoint="${api.endpoint}">
+                            <i class="fas fa-copy"></i> Kopyala
+                        </button>
+                        <button class="btn btn-test" data-endpoint="${api.endpoint}">
+                            <i class="fas fa-external-link-alt"></i> Test Et
+                        </button>
+                    </div>
+                    <p class="api-description">${api.description}</p>
+                `;
+                apiGrid.appendChild(apiCard);
+            });
+
+            document.querySelectorAll('.btn-copy').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const endpoint = this.getAttribute('data-endpoint');
+                    copyToClipboard(endpoint);
+                    showNotification('API endpoint panoya kopyalandı!');
+                });
+            });
+
+            document.querySelectorAll('.btn-test').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const endpoint = this.getAttribute('data-endpoint');
+                    window.open(endpoint, '_blank');
+                });
+            });
+        }
+
+        function copyToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+        }
+
+        function showNotification(message) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.classList.add('show');
+            setTimeout(() => { notification.classList.remove('show'); }, 2500);
+        }
+
+        function showFunnyMessage() {
+            const message = document.getElementById('funnyMessage');
+            message.style.display = 'block';
+            setTimeout(() => { message.style.display = 'none'; }, 2200);
+        }
+
+        document.addEventListener("contextmenu", function(e) { e.preventDefault(); showFunnyMessage(); });
+        document.addEventListener("keydown", function(e) {
+            if (e.keyCode === 123 || (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 67 || e.keyCode === 74)) || (e.ctrlKey && e.keyCode === 85)) {
+                e.preventDefault(); showFunnyMessage();
+            }
+            if (e.ctrlKey && e.keyCode === 67) { e.preventDefault(); showFunnyMessage(); }
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            createParticles();
+            createApiCards();
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    const category = this.getAttribute('data-category');
+                    createApiCards(category);
+                });
+            });
+            document.querySelectorAll('.footer-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    if (this.getAttribute('href').startsWith('#')) {
+                        e.preventDefault();
+                        const targetElement = document.querySelector(this.getAttribute('href'));
+                        if (targetElement) targetElement.scrollIntoView({ behavior: 'smooth' });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
